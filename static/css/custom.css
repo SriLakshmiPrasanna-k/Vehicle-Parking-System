@@ -1,0 +1,204 @@
+/* Custom styles for the parking management system */
+
+/* General styling */
+body {
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+}
+
+/* Card enhancements */
+.card {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Statistics cards */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-danger,
+.card.bg-warning,
+.card.bg-info,
+.card.bg-secondary {
+    border: none;
+}
+
+.card.bg-primary .card-body h4,
+.card.bg-success .card-body h4,
+.card.bg-danger .card-body h4,
+.card.bg-warning .card-body h4,
+.card.bg-info .card-body h4,
+.card.bg-secondary .card-body h4 {
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+/* Radio button cards for parking lot selection */
+.form-check-input[type="radio"] {
+    margin-top: 0.25rem;
+}
+
+.form-check-label .card {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-check-input:checked + .form-check-label .card {
+    border-color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+/* Table enhancements */
+.table {
+    --bs-table-bg: transparent;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > td,
+.table-striped > tbody > tr:nth-of-type(odd) > th {
+    background-color: rgba(var(--bs-light-rgb), 0.05);
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    margin: 0 0.25rem;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(var(--bs-light-rgb), 0.1);
+}
+
+/* Alert enhancements */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+/* Badge enhancements */
+.badge {
+    font-size: 0.875em;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Button group enhancements */
+.btn-group .btn {
+    border-radius: 0.375rem;
+    margin: 0 0.125rem;
+}
+
+/* Jumbotron style */
+.jumbotron {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border-radius: 1rem;
+}
+
+/* Loading animation for charts */
+.chart-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: var(--bs-secondary);
+}
+
+.chart-loading::after {
+    content: "Loading chart...";
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        opacity: 0.5;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin: 0.125rem 0;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* Status indicators */
+.status-available {
+    color: var(--bs-success);
+}
+
+.status-occupied {
+    color: var(--bs-danger);
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+}
+
+/* Step indicators for how it works */
+.step h6 {
+    color: var(--bs-light);
+}
+
+.step .fas {
+    width: 20px;
+    text-align: center;
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.form-control:focus,
+.form-check-input:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .btn,
+    footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000;
+        break-inside: avoid;
+    }
+}
