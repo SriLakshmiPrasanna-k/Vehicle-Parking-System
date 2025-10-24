@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard - Vehicle Parking Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt"></i> My Dashboard</h2>
+    {% if not active_reservations %}
+        <a href="{{ url_for('book_parking') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Book Parking
+        </a>
+    {% endif %}
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-history fa-2x mb-2"></i>
+                <h4>{{ stats.total_reservations }}</h4>
+                <small>Total Bookings</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-2x mb-2"></i>
+                <h4>{{ stats.active_reservations }}</h4>
+                <small>Active</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                <h4>{{ stats.completed_reservations }}</h4>
+                <small>Completed</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-rupee-sign fa-2x mb-2"></i>
+                <h4>₹{{ stats.total_spent }}</h4>
+                <small>Total Spent</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Reservations -->
+{% if active_reservations %}
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5><i class="fas fa-exclamation-triangle"></i> Active Parking Session</h5>
+        </div>
+        <div class="card-body">
+            {% for reservation in active_reservations %}
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6><i class="fas fa-map-marker-alt"></i> {{ reservation.spot.lot.prime_location_name }}</h6>
+                        <p class="mb-1">
+                            <i class="fas fa-square"></i> Spot #{{ reservation.spot.spot_number }} |
+                            <i class="fas fa-clock"></i> Parked since: {{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-hourglass-half"></i> Duration: {{ "%.2f"|format(reservation.duration_hours) }} hours |
+                            <i class="fas fa-rupee-sign"></i> Current cost: ₹{{ "%.2f"|format(reservation.calculated_cost) }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('release_parking', reservation_id=reservation.id) }}" 
+                           class="btn btn-danger"
+                           onclick="return confirm('Are you sure you want to release this parking spot?')">
+                            <i class="fas fa-unlock"></i> Release Spot
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Charts Section -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-pie"></i> Booking Summary</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="bookingChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Monthly Spending</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="spendingChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Reservations -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-history"></i> Recent Bookings</h5>
+    </div>
+    <div class="card-body">
+        {% if recent_reservations %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Spot #</th>
+                            <th>Parked Time</th>
+                            <th>Left Time</th>
+                            <th>Duration</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reservation in recent_reservations %}
+                            <tr>
+                                <td>{{ reservation.spot.lot.prime_location_name }}</td>
+                                <td>{{ reservation.spot.spot_number }}</td>
+                                <td>{{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if reservation.leaving_timestamp %}
+                                        {{ reservation.leaving_timestamp.strftime('%Y-%m-%d %H:%M') }}
+                                    {% else %}
+                                        <span class="text-warning">Still parked</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ "%.2f"|format(reservation.duration_hours) }} hrs</td>
+                                <td>
+                                    {% if reservation.total_cost %}
+                                        ₹{{ "%.2f"|format(reservation.total_cost) }}
+                                    {% else %}
+                                        ₹{{ "%.2f"|format(reservation.calculated_cost) }} (current)
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if reservation.leaving_timestamp %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Active</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No booking history yet. 
+                <a href="{{ url_for('book_parking') }}">Book your first parking spot</a>!
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure DOM is fully ready
+    setTimeout(() => {
+        loadUserCharts();
+    }, 500);
+});
+</script>
+{% endblock %}

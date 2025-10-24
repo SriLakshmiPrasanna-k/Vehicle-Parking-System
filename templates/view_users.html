@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}View Users - Vehicle Parking Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-users"></i> Registered Users</h2>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-list"></i> User Management</h5>
+        <p class="text-muted mb-0">All registered users in the system</p>
+    </div>
+    <div class="card-body">
+        {% if users %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Registration Date</th>
+                            <th>Total Bookings</th>
+                            <th>Active Reservations</th>
+                            <th>Total Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>
+                                    <i class="fas fa-user"></i> {{ user.username }}
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ user.reservations|length }}</span>
+                                </td>
+                                <td>
+                                    {% set active_count = user.reservations|selectattr('leaving_timestamp', 'none')|list|length %}
+                                    {% if active_count > 0 %}
+                                        <span class="badge bg-warning">{{ active_count }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">0</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% set total_spent = user.reservations|selectattr('total_cost', 'defined')|map(attribute='total_cost')|sum %}
+                                    ₹{{ "%.2f"|format(total_spent or 0) }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Summary Statistics -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h4>{{ users|length }}</h4>
+                            <small>Total Users</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            {% set total_bookings = users|map(attribute='reservations')|map('length')|sum %}
+                            <h4>{{ total_bookings }}</h4>
+                            <small>Total Bookings</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body text-center">
+                            {% set active_bookings = 0 %}
+                            {% for user in users %}
+                                {% set active_count = user.reservations|selectattr('leaving_timestamp', 'none')|list|length %}
+                                {% set active_bookings = active_bookings + active_count %}
+                            {% endfor %}
+                            <h4>{{ active_bookings }}</h4>
+                            <small>Active Bookings</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            {% set total_revenue = 0 %}
+                            {% for user in users %}
+                                {% set user_spent = user.reservations|selectattr('total_cost', 'defined')|map(attribute='total_cost')|sum %}
+                                {% set total_revenue = total_revenue + (user_spent or 0) %}
+                            {% endfor %}
+                            <h4>₹{{ "%.0f"|format(total_revenue) }}</h4>
+                            <small>Total Revenue</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No users registered yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

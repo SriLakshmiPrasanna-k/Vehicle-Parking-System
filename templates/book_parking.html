@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Book Parking - Vehicle Parking Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-plus-circle"></i> Book Parking Spot</h4>
+                <p class="text-muted mb-0">Choose an available parking lot to book your spot</p>
+            </div>
+            <div class="card-body">
+                {% if lots %}
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label class="form-label"><strong>Select a Parking Lot:</strong></label>
+                            
+                            {% for lot in lots %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="lot_id" 
+                                                   value="{{ lot.id }}" id="lot{{ lot.id }}" required>
+                                            <label class="form-check-label w-100" for="lot{{ lot.id }}">
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <h6 class="mb-1">
+                                                            <i class="fas fa-building"></i> {{ lot.prime_location_name }}
+                                                        </h6>
+                                                        <p class="mb-1 text-muted">
+                                                            <i class="fas fa-map-pin"></i> {{ lot.address }}, {{ lot.pin_code }}
+                                                        </p>
+                                                        <p class="mb-0">
+                                                            <i class="fas fa-rupee-sign"></i> ₹{{ lot.price_per_hour }}/hour
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-4 text-end">
+                                                        <div class="mb-2">
+                                                            <span class="badge bg-success fs-6">
+                                                                {{ lot.available_spots_count }} Available
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span class="badge bg-danger fs-6">
+                                                                {{ lot.occupied_spots_count }} Occupied
+                                                            </span>
+                                                        </div>
+                                                        <small class="text-muted d-block mt-1">
+                                                            Total: {{ lot.maximum_number_of_spots }} spots
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Book Spot
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        No parking lots with available spots at the moment. Please try again later.
+                    </div>
+                    <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Booking Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6><i class="fas fa-clock"></i> How it works:</h6>
+                    <ol class="small">
+                        <li>Select a parking lot from the available options</li>
+                        <li>Click "Book Spot" to get the next available spot</li>
+                        <li>You'll be automatically assigned a spot number</li>
+                        <li>Park your vehicle and the timer starts</li>
+                        <li>Come back to release the spot when leaving</li>
+                    </ol>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-rupee-sign"></i> Pricing:</h6>
+                    <p class="small">
+                        You'll be charged based on the hourly rate of the selected 
+                        parking lot. The cost is calculated from the time you book 
+                        until you release the spot.
+                    </p>
+                </div>
+                
+                <div class="alert alert-info">
+                    <small>
+                        <i class="fas fa-exclamation-circle"></i> 
+                        You can only have one active parking reservation at a time.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
